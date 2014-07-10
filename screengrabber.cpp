@@ -87,6 +87,26 @@ void ScreenGrabber::stopRecording(){
     qDebug() << "Stopped recording, closing the video file.";
 }
 
+/*
+ * Sets the main widget to be recorded.
+ * It will be captured by the w->grab() by setPixMap() later, converted and saved by saveScreen()
+ */
+void ScreenGrabber::setPixmapSourceWidget(QWidget *w ){
+    pixmapSourceWidget = w;
+}
+
+// Adds the current frame to the videowriter
+void ScreenGrabber::saveScreen(){
+    frameNumber++;
+    //    qDebug() << "Screen saved " << frameNumber;
+    setPixmap();
+    pixmapToImage();
+    if(isRecording && frameNumber>1) {
+        videoWriter.addFrame((const uint8_t*) originalImage.bits());
+    }
+}
+
+
 
 /*
  * Shows file dialog
@@ -117,20 +137,6 @@ QImage ScreenGrabber::getImage(){
     return originalImage;
 }
 
-void ScreenGrabber::setPixmapSourceWidget(QWidget *w ){
-    pixmapSourceWidget = w;
-}
-
-// Adds the current frame to the videowriter
-void ScreenGrabber::saveScreen(){
-    frameNumber++;
-    //    qDebug() << "Screen saved " << frameNumber;
-    setPixmap();
-    pixmapToImage();
-    if(isRecording && frameNumber>1) {
-        videoWriter.addFrame((const uint8_t*) originalImage.bits());
-    }
-}
 
 
 void ScreenGrabber::setPixmap(){

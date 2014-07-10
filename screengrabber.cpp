@@ -7,6 +7,11 @@ ScreenGrabber::ScreenGrabber(QWidget *parent) :
     frameNumber = 0;
 }
 
+/*
+ * Creates a screen grabber without file name.
+ * Filename is asked via a FileDialog when startRecording is called.
+ *
+ */
 void ScreenGrabber::setup(int w, int h){
     width = w;
     height = h;
@@ -14,6 +19,10 @@ void ScreenGrabber::setup(int w, int h){
     frameNumber = 0;
 }
 
+/*
+ * Creates a screen grabber with a file name.
+ *
+ */
 void ScreenGrabber::setup(QString fName, int w, int h){
     width = w;
     height = h;
@@ -23,6 +32,11 @@ void ScreenGrabber::setup(QString fName, int w, int h){
     videoWriter.setup(fileName.toLatin1(), width, height);
 }
 
+/*
+ * Starts recording.
+ * Records the frame every 1/25 seconds until stopRecording is called.
+ *
+ */
 void ScreenGrabber::startRecording(){
     if(fileName.isEmpty())
         showFileDialog();
@@ -39,7 +53,11 @@ void ScreenGrabber::startRecording(){
 
 }
 
-
+/*
+ * Starts recording.
+ * Records the frame every 1/25 seconds for given seconds.
+ *
+ */
 void ScreenGrabber::startRecording(int seconds){
     if(fileName.isEmpty())
         showFileDialog();
@@ -60,6 +78,19 @@ void ScreenGrabber::startRecording(int seconds){
     }
 }
 
+// Stops recording
+void ScreenGrabber::stopRecording(){
+    frameNumber = 0;
+    isRecording= false;
+    videoWriter.close();
+    timer->stop();
+    qDebug() << "Stopped recording, closing the video file.";
+}
+
+
+/*
+ * Shows file dialog
+ */
 void ScreenGrabber::showFileDialog(){
     QString initialPath = QDir::currentPath();
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), initialPath, tr("%1 Files (*.%2);;All Files (*)")
@@ -90,6 +121,7 @@ void ScreenGrabber::setPixmapSourceWidget(QWidget *w ){
     pixmapSourceWidget = w;
 }
 
+// Adds the current frame to the videowriter
 void ScreenGrabber::saveScreen(){
     frameNumber++;
     //    qDebug() << "Screen saved " << frameNumber;
@@ -100,22 +132,13 @@ void ScreenGrabber::saveScreen(){
     }
 }
 
-void ScreenGrabber::pixmapToImage() {
-    QImage img = originalPixmap.toImage();
-    originalImage = img.convertToFormat(QImage::Format_RGB888);
-}
-
-
-
-void ScreenGrabber::stopRecording(){
-    frameNumber = 0;
-    isRecording= false;
-    videoWriter.close();
-    timer->stop();
-    qDebug() << "Stopped recording, closing the video file.";
-}
 
 void ScreenGrabber::setPixmap(){
     originalPixmap = QPixmap();
     originalPixmap = pixmapSourceWidget->grab();
+}
+
+void ScreenGrabber::pixmapToImage() {
+    QImage img = originalPixmap.toImage();
+    originalImage = img.convertToFormat(QImage::Format_RGB888);
 }

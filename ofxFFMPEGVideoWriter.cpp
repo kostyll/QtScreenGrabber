@@ -130,14 +130,16 @@ void ofxFFMPEGVideoWriter::setup(const char* filename, int width, int height) {
     if (!(fmt->flags & AVFMT_NOFILE)) {
         int ret;
         if ((ret = avio_open(&oc->pb, filename, AVIO_FLAG_WRITE)) < 0) {
-            fprintf(stderr, "Could not open '%s': %s\n", filename, av_err2str(ret));
+            //fprintf(stderr, "Could not open '%s': %s\n", filename, av_err2str(ret));
+            std::cerr << "Could not open: " << filename << std::endl;
             exit(1);
         }
     }
     /* Write the stream header, if any. */
     int ret = avformat_write_header(oc, NULL);
     if (ret < 0) {
-        fprintf(stderr, "Error occurred when opening output file: %s\n", av_err2str(ret));
+        //fprintf(stderr, "Error occurred when opening output file: %s\n", av_err2str(ret));
+        std::cerr << "CError occurred when opening output file:: " << ret << std::endl;
         exit(1);
     }
 
@@ -168,7 +170,8 @@ void ofxFFMPEGVideoWriter::addFrame(const uint8_t* pixels) {
     /* encode the image */
     int ret = avcodec_encode_video2(c, &pkt, picture, &got_packet);
     if (ret < 0) {
-        fprintf(stderr, "Error encoding video frame: %s\n", av_err2str(ret));
+        //fprintf(stderr, "Error encoding video frame: %s\n", av_err2str(ret));
+        std::cerr << "Error encoding video frame: " << ret << std::endl;
         exit(1);
     }
     /* If size is zero, it means the image was buffered. */
